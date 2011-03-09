@@ -1,0 +1,11 @@
+JS Toolbox
+Author: Jimmy Do
+License: MIT
+
+An assortment of useful JavaScript code.
+
+Depends on:
+- Underscore.js (http://documentcloud.github.com/underscore/)
+- Backbone.js (http://documentcloud.github.com/backbone/)
+- jQuery (http://jquery.com/)
+
