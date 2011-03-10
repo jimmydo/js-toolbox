@@ -50,7 +50,7 @@
             setter: setter,
             isComputedProperty: true
         };
-    };
+    }
 
     // Provides support for property change notifications and computed properties.
     // This module can be used by mixing it into an object or class prototype.
@@ -80,6 +80,10 @@
             // Build a mapping from a property name to the list of property names
             // that depend on it.
             var watchers = this._watchers = {};
+
+            // NOTE: This loop should include both properties explicitly assigned
+            // to `this` and properties inherited from the prototype chain, so that
+            // we handle all computed properties.
             for (var key in this) {
                 var value = this[key];
                 if (value.isComputedProperty) {
