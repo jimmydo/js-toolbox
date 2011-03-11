@@ -86,7 +86,7 @@
             // we handle all computed properties.
             for (var key in this) {
                 var value = this[key];
-                if (value.isComputedProperty) {
+                if (value && value.isComputedProperty) {
                     _.each(value.watches, function (watch) {
                         watchers[watch] = watchers[watch] || [];
                         watchers[watch].push(key);

@@ -175,3 +175,9 @@ test('binding', function () {
     obj2.set('two', 200);
     strictEqual(obj1.get('one'), 200, 'change is propagated to first object');
 });
+
+test('null property value', function () {
+    var obj1 = new Toolbox.LiveObject({
+        someProp: null
+    });
+});
