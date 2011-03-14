@@ -1,4 +1,4 @@
-module('Toolbox.Object');
+module('Toolbox.Base');
 
 test('instanceof', function () {
     var Test1 = Toolbox.Base.extend({});
@@ -181,3 +181,37 @@ test('null property value', function () {
         someProp: null
     });
 });
+
+test('constructor prop', function () {
+    var MyClass = Toolbox.Base.extend({});
+    strictEqual(MyClass, (new MyClass()).constructor);
+});
+
+test('constructor can return different instance', function () {
+    var testObj = {};
+    var MyClass = Toolbox.Base.extend({
+        constructor: function () {
+            return testObj;
+        }
+    });
+    strictEqual(new MyClass(), testObj);
+});
+
+test('constructor returns parent constructor return value', function () {
+    var testObj = {};
+    var Test1 = Toolbox.Base.extend({
+        constructor: function () {
+            return testObj;
+        }
+    });
+    var Test2 = Test1.extend({});
+    strictEqual(new Test2(), testObj);
+});
+
+test('parent prototype', function () {
+    var Test1 = Toolbox.Base.extend({});
+    var Test2 = Test1.extend({});
+    strictEqual(Test1.__super__, Toolbox.Base.prototype);
+    strictEqual(Test2.__super__, Test1.prototype);
+});
+

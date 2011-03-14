@@ -1,30 +1,53 @@
 (function () {
+
+    // Dummy class for creating inheritance chain.
+    function Dummy() {}
+
     // Setup inheritance chain so that instances of the `child` class will also
     // be instances of the `parent` class, as determined by the `instanceof` operator.
     function inherits(child, parent) {
-        function T() {}
-        T.prototype = parent.prototype;
-        child.prototype = new T();
+        // Avoid executing `parent` constructor by creating an instance of the
+        // dummy class instead.
+        Dummy.prototype = parent.prototype;
+        child.prototype = new Dummy();
+    }
+
+    // Create a new class that inherits from the `parent` class.
+    // If `childProps` contains a method named `constructor`, then it will be
+    // used as the constructor function. Otherwise, a constructor function will
+    // be created automatically.
+    // The parent class prototype can be accessed using `*ChildClass*.__super__`.
+    function extend(parent, childProps) {
+        var child;
+        childProps = childProps || {};
+        // By convention, `constructor` is the name of the constructor function,
+        // to match the standard property where you usually find the constructor
+        // function for an object.
+        if (childProps.hasOwnProperty('constructor')) {
+            child = childProps.constructor;
+        } else {
+            child = function () {
+                return parent.apply(this, arguments);
+            };
+            // Make sure `constructor` property points to actual constructor function.
+            childProps.constructor = child;
+        }
+        inherits(child, parent);
+        child.__super__ = parent.prototype;
+        _.extend(child.prototype, childProps);
+        return child;
     }
 
     // Create a new class that inherits from the class found in the `this` context object.
     // This function is meant to be called in the context of a constructor function.
-    // The parent class prototype can be accessed using `ChildClass.PARENT`.
-    function extendHelper(childProps) {
-        function childClass() {
-            if (this.init) {
-                this.init.apply(this, arguments);
-            }
-        }
-        var parentClass = this;
-        childClass.extend = extendHelper;
-        childClass.PARENT = parentClass.prototype;
-        inherits(childClass, parentClass);
-        _.extend(childClass.prototype, childProps);
-        return childClass;
+    function extendThis(childProps) {
+        var child = extend(this, childProps);
+        child.extend = extendThis;
+        return child;
     }
 
     // A simple base class that allows easy creation of subclasses.
+    // All subclasses will have the `extend` function.
     // Example:
     //     var MyClass = Base.extend({
     //         someProp: 'My property value',
@@ -32,9 +55,9 @@
     //     });
     //     var inst1 = new MyClass();
     function Base() {}
-    Base.extend = extendHelper;
+    Base.extend = extendThis;
 
-    // Delcare a computed property.
+    // Declare a computed property.
     // `watched` is a list of property names that this computed property depends on.
     // A change to any property in `watches` will trigger a change event for the property.
     // `getter` is a function that takes no arguments and returns the property value.
@@ -56,11 +79,11 @@
     // This module can be used by mixing it into an object or class prototype.
     // `set()` will trigger a change event for the modified property, where the
     // event name is: `*propertyName*Changed`.
-    // A computed property can be declared using `prop()`.
+    // A computed property can be declared using `Toolbox.prop()`.
     // Example:
     // var MyClass = Base.extend({
     //     prop1: 'apple',
-    //     prop2: prop(['prop1'], function () {
+    //     prop2: Toolbox.prop(['prop1'], function () {
     //         return 'pine' + this.get('prop1');
     //     })
     // });
@@ -76,7 +99,7 @@
             if (initProps) {
                 _.extend(this, initProps);
             }
-            // Map from property name to names of properties that watch that properties.
+
             // Build a mapping from a property name to the list of property names
             // that depend on it.
             var watchers = this._watchers = {};
@@ -143,7 +166,7 @@
     // Convenience class that extends Base and already integrates the SmartProperties
     // mixin module.
     var LiveObject = Base.extend({
-        init: function (props) {
+        constructor: function (props) {
             this.initSmartProperties(props);
         }
     });
