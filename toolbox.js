@@ -1,48 +1,53 @@
 (function () {
     "use strict";
 
-    // Dummy class for creating inheritance chain.
-    function Dummy() {}
+    // `ctor` and `inherits` are from Backbone.js (with some modifications):
+    // http://documentcloud.github.com/backbone/
 
-    // Setup inheritance chain so that instances of the `child` class will also
-    // be instances of the `parent` class, as determined by the `instanceof` operator.
-    function inherits(child, parent) {
-        // Avoid executing `parent` constructor by creating an instance of the
-        // dummy class instead.
-        Dummy.prototype = parent.prototype;
-        child.prototype = new Dummy();
-    }
+    // Shared empty constructor function to aid in prototype-chain creation.
+    var ctor = function(){};
 
-    // Create a new class that inherits from the `parent` class.
-    // If `childProps` contains a method named `constructor`, then it will be
-    // used as the constructor function. Otherwise, a constructor function will
-    // be created automatically.
-    // The parent class prototype can be accessed using `*ChildClass*.__super__`.
-    function extend(parent, childProps) {
+    // Helper function to correctly set up the prototype chain, for subclasses.
+    // Similar to `goog.inherits`, but uses a hash of prototype properties and
+    // class properties to be extended.
+    var inherits = function(parent, protoProps, staticProps) {
         var child;
-        childProps = childProps || {};
-        // By convention, `constructor` is the name of the constructor function,
-        // to match the standard property where you usually find the constructor
-        // function for an object.
-        if (childProps.hasOwnProperty('constructor')) {
-            child = childProps.constructor;
-        } else {
-            child = function () {
-                return parent.apply(this, arguments);
-            };
-            // Make sure `constructor` property points to actual constructor function.
-            childProps.constructor = child;
-        }
-        inherits(child, parent);
-        child.__super__ = parent.prototype;
-        _.extend(child.prototype, childProps);
-        return child;
-    }
 
+        // The constructor function for the new subclass is either defined by you
+        // (the "constructor" property in your `extend` definition), or defaulted
+        // by us to simply call `super()`.
+        if (protoProps && protoProps.hasOwnProperty('constructor')) {
+            child = protoProps.constructor;
+        } else {
+            child = function () { return parent.apply(this, arguments); };
+        }
+
+        // Set the prototype chain to inherit from `parent`, without calling
+        // `parent`'s constructor function.
+        ctor.prototype = parent.prototype;
+        child.prototype = new ctor();
+
+        // Add prototype properties (instance properties) to the subclass,
+        // if supplied.
+        if (protoProps) _.extend(child.prototype, protoProps);
+
+        // Add static properties to the constructor function, if supplied.
+        if (staticProps) _.extend(child, staticProps);
+
+        // Correctly set child's `prototype.constructor`, for `instanceof`.
+        child.prototype.constructor = child;
+
+        // Set a convenience property in case the parent's prototype is needed later.
+        child.__super__ = parent.prototype;
+
+        return child;
+    };
+
+    // Self-propagating extend function.
     // Create a new class that inherits from the class found in the `this` context object.
     // This function is meant to be called in the context of a constructor function.
-    function extendThis(childProps) {
-        var child = extend(this, childProps);
+    function extendThis(protoProps, staticProps) {
+        var child = inherits(this, protoProps, staticProps);
         child.extend = extendThis;
         return child;
     }
