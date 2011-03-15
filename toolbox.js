@@ -1,4 +1,5 @@
 (function () {
+    "use strict";
 
     // Dummy class for creating inheritance chain.
     function Dummy() {}
