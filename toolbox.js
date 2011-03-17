@@ -7,12 +7,12 @@
     // http://documentcloud.github.com/backbone/
 
     // Shared empty constructor function to aid in prototype-chain creation.
-    var ctor = function(){};
+    var ctor = function () {};
 
     // Helper function to correctly set up the prototype chain, for subclasses.
     // Similar to `goog.inherits`, but uses a hash of prototype properties and
     // class properties to be extended.
-    var inherits = function(parent, protoProps, staticProps) {
+    var inherits = function (parent, protoProps, staticProps) {
         var child;
 
         // The constructor function for the new subclass is either defined by you
@@ -36,7 +36,7 @@
         // Add static properties to the constructor function, if supplied.
         if (staticProps) _.extend(child, staticProps);
 
-        // Correctly set child's `prototype.constructor`, for `instanceof`.
+        // Correctly set child's `prototype.constructor`.
         child.prototype.constructor = child;
 
         // Set a convenience property in case the parent's prototype is needed later.
