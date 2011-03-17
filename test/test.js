@@ -8,6 +8,40 @@ test('instanceof', function () {
     ok(new Test2() instanceof Test1, 'Test2 should be a Test1 object');
 });
 
+test('constructor property', function () {
+    var MyClass = Toolbox.Base.extend({});
+    strictEqual(MyClass, (new MyClass()).constructor);
+});
+
+test('constructor can return different instance', function () {
+    var testObj = {};
+    var MyClass = Toolbox.Base.extend({
+        constructor: function () {
+            return testObj;
+        }
+    });
+    strictEqual(new MyClass(), testObj);
+});
+
+test('child constructor returns parent constructor return value', function () {
+    var testObj = {};
+    var Test1 = Toolbox.Base.extend({
+        constructor: function () {
+            return testObj;
+        }
+    });
+    var Test2 = Test1.extend({});
+    strictEqual(new Test2(), testObj);
+});
+
+test('__super__', function () {
+    var Test1 = Toolbox.Base.extend({});
+    var Test2 = Test1.extend({});
+    strictEqual(Test1.__super__, Toolbox.Base.prototype);
+    strictEqual(Test2.__super__, Test1.prototype);
+});
+
+
 module('Toolbox.LiveObject');
 
 test('attribute without default value', function () {
@@ -180,38 +214,5 @@ test('null property value', function () {
     var obj1 = new Toolbox.LiveObject({
         someProp: null
     });
-});
-
-test('constructor prop', function () {
-    var MyClass = Toolbox.Base.extend({});
-    strictEqual(MyClass, (new MyClass()).constructor);
-});
-
-test('constructor can return different instance', function () {
-    var testObj = {};
-    var MyClass = Toolbox.Base.extend({
-        constructor: function () {
-            return testObj;
-        }
-    });
-    strictEqual(new MyClass(), testObj);
-});
-
-test('constructor returns parent constructor return value', function () {
-    var testObj = {};
-    var Test1 = Toolbox.Base.extend({
-        constructor: function () {
-            return testObj;
-        }
-    });
-    var Test2 = Test1.extend({});
-    strictEqual(new Test2(), testObj);
-});
-
-test('parent prototype', function () {
-    var Test1 = Toolbox.Base.extend({});
-    var Test2 = Test1.extend({});
-    strictEqual(Test1.__super__, Toolbox.Base.prototype);
-    strictEqual(Test2.__super__, Test1.prototype);
 });
 
