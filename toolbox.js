@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    var Toolbox = this.Toolbox = {};
+    var Toolbox = window.Toolbox = {};
 
     // `ctor` and `inherits` are from Backbone (with some modifications):
     // http://documentcloud.github.com/backbone/

@@ -1,5 +1,5 @@
 (function () {
-    var Toolbox = this.Toolbox = (this.Toolbox || {});
+    var Toolbox = window.Toolbox = (window.Toolbox || {});
 
     // Declare a computed property.
     // `watched` is a list of property names that this computed property depends on.
